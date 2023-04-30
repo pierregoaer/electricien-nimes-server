@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/ayyw5507/repositories/electricien_nimes_server
+    - /bin cp * $DEPLOYPATH
