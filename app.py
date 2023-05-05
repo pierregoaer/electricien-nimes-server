@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, make_response
 from flask_mail import Message, Mail
 from flask_cors import CORS, cross_origin
+import mysql.connector
+from mysql.connector import Error
 from datetime import datetime
 import os
 import gspread
@@ -19,8 +21,8 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 # TODO: Select proper origin for DEV or PROD
-# cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_DEV']]}})
-cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
+cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_DEV']]}})
+# cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
 
 
 # Get blogs from Google Sheet
@@ -40,11 +42,28 @@ GOOGLE_SERVICE_ACCOUNT_CREDENTIALS = {
 service_acc = gspread.service_account_from_dict(GOOGLE_SERVICE_ACCOUNT_CREDENTIALS)
 gsheet_file = service_acc.open("electricien-nimes")
 
+# Switching to MySQL DB
+mydb = mysql.connector.connect(
+    host=os.environ.get('MYSQLHOST'),
+    user=os.environ.get('MYSQLUSER'),
+    password=os.environ.get('MYSQLPASSWORD'),
+    database=os.environ.get('MYSQLDATABASE')
+)
+cursor = mydb.cursor(buffered=True, dictionary=True)
+
+get_blogs_query = """ 
+SELECT * FROM blog
+"""
+
 
 @app.route('/get-blogs')
 def get_blogs():
+    # cursor.execute(get_blogs_query)
+    # check_for_user = cursor.fetchall()
+    # print(check_for_user)
     blog_worksheet = gsheet_file.worksheet("blogs")
     blog_data = blog_worksheet.get_all_records()
+    # print(blog_data)
     return jsonify(blog_data), 200
 
 
@@ -86,5 +105,5 @@ def contact():
 
 if __name__ == "__main__":
     # TODO: Select proper run for DEV or PROD
-    # app.run(port=8000, debug=True)
-    app.run()
+    app.run(port=8000, debug=True)
+    # app.run()
