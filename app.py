@@ -21,8 +21,10 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 # TODO: Select proper origin for DEV or PROD
-cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_DEV']]}})
-# cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
+# DEV CORS
+# cors = CORS(app, resources={r'/*': {'origins': '*'}})
+# PROD CORS
+cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
 
 
 # Get blogs from Google Sheet
@@ -55,16 +57,15 @@ get_blogs_query = """
 SELECT * FROM blog
 """
 
+cursor.execute(get_blogs_query)
+blogs = cursor.fetchall()
+
 
 @app.route('/get-blogs')
 def get_blogs():
-    # cursor.execute(get_blogs_query)
-    # check_for_user = cursor.fetchall()
-    # print(check_for_user)
-    blog_worksheet = gsheet_file.worksheet("blogs")
-    blog_data = blog_worksheet.get_all_records()
-    # print(blog_data)
-    return jsonify(blog_data), 200
+    # blog_worksheet = gsheet_file.worksheet("blogs")
+    # blog_data = blog_worksheet.get_all_records()
+    return jsonify(blogs), 200
 
 
 @app.route('/contact', methods=['POST'])
@@ -105,5 +106,5 @@ def contact():
 
 if __name__ == "__main__":
     # TODO: Select proper run for DEV or PROD
-    app.run(port=8000, debug=True)
-    # app.run()
+    # app.run(port=8000, debug=True)
+    app.run()
