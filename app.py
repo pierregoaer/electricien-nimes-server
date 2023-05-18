@@ -24,7 +24,7 @@ mail = Mail(app)
 # DEV CORS
 # cors = CORS(app, resources={r'/*': {'origins': '*'}})
 # PROD CORS
-cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
+# cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
 
 
 # Get blogs from Google Sheet
@@ -62,6 +62,7 @@ blogs = cursor.fetchall()
 
 
 @app.route('/get-blogs')
+@cross_origin(origins='https://electricien-nimes.com/')
 def get_blogs():
     # blog_worksheet = gsheet_file.worksheet("blogs")
     # blog_data = blog_worksheet.get_all_records()
@@ -69,6 +70,7 @@ def get_blogs():
 
 
 @app.route('/contact', methods=['POST'])
+@cross_origin(origins='https://electricien-nimes.com/contact/')
 def contact():
     # get contact form data
     form_data = request.get_json()
