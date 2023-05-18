@@ -75,14 +75,17 @@ def contact():
     name = form_data["name"]
     email = form_data["email"]
     phone = form_data["phone"]
+    service = form_data["service"]
+    timeframe = form_data["timeframe"]
+    budget = form_data["budget"]
     message = form_data["message"]
     today = datetime.today().strftime("%d/%m/%Y %H:%M:%S")
 
     # update google sheet
     contacts_worksheet = gsheet_file.worksheet("contacts")
     worksheet_rows = len(contacts_worksheet.get_all_values())
-    new_data = [today, name, email, phone, message]
-    for col in range(1, 6):
+    new_data = [today, name, email, phone, service, timeframe, budget, message]
+    for col in range(1, len(new_data) + 1):
         contacts_worksheet.update_cell(worksheet_rows + 1, col, str(new_data[col - 1]))
 
     # send email notification
@@ -92,13 +95,16 @@ def contact():
            f"Nom : {name}<br>" \
            f"Email : {email}<br>" \
            f"Téléphone : {phone}<br>" \
+           f"Service : {service}<br>" \
+           f"Délais : {timeframe}<br>" \
+           f"Budget : {budget}<br>" \
            f"Message : {message}<br><br>" \
            f"Voir https://docs.google.com/spreadsheets/d/1PDZtqhsUVgdv83s_uAGr3Z_ElT4_dfMtBocGqSq9SxM/edit#gid=330549784"
     msg = Message(
         subject='Electricien Nîmes - Nouveau message!',
         html=html,
         sender=('Contact - Electricien Nîmes', app.config['MAIL_USERNAME']),
-        recipients=[os.environ["EMAIL_RECIPIENT_1"]]
+        recipients=[os.environ["EMAIL_RECIPIENT_1"], os.environ["EMAIL_RECIPIENT_2"]]
     )
     mail.send(msg)
     return "success", 200
