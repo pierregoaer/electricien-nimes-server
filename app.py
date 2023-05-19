@@ -62,15 +62,13 @@ blogs = cursor.fetchall()
 
 
 @app.route('/get-blogs')
-@cross_origin(origins='https://electricien-nimes.com/')
+@cross_origin(origins='https://electricien-nimes.com')
 def get_blogs():
-    # blog_worksheet = gsheet_file.worksheet("blogs")
-    # blog_data = blog_worksheet.get_all_records()
     return jsonify(blogs), 200
 
 
 @app.route('/contact', methods=['POST'])
-@cross_origin(allow_headers=['Content-Type'], origins=['https://electricien-nimes.com/contact', 'https://electricien-nimes.com/contact/'])
+@cross_origin(origins='https://electricien-nimes.com')
 def contact():
     # get contact form data
     form_data = request.get_json()
