@@ -22,7 +22,7 @@ mail = Mail(app)
 
 # TODO: Select proper origin for DEV or PROD
 # DEV CORS
-# cors = CORS(app, resources={r'/*': {'origins': '*'}})
+cors = CORS(app, resources={r'/*': {'origins': '*'}})
 # PROD CORS
 # cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
 
@@ -62,13 +62,13 @@ blogs = cursor.fetchall()
 
 
 @app.route('/get-blogs')
-@cross_origin(origins='https://electricien-nimes.com')
+# @cross_origin(origins='https://electricien-nimes.com')
 def get_blogs():
     return jsonify(blogs), 200
 
 
 @app.route('/contact', methods=['POST'])
-@cross_origin(origins='https://electricien-nimes.com')
+# @cross_origin(origins='https://electricien-nimes.com')
 def contact():
     # get contact form data
     form_data = request.get_json()
