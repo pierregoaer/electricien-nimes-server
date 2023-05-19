@@ -22,9 +22,9 @@ mail = Mail(app)
 
 # TODO: Select proper origin for DEV or PROD
 # DEV CORS
-cors = CORS(app, resources={r'/*': {'origins': '*'}})
+# cors = CORS(app, resources={r'/*': {'origins': '*'}})
 # PROD CORS
-# cors = CORS(app, resources={r'/*': {'origins': [os.environ['CORS_ORIGIN_PROD']]}})
+cors = CORS(app, resources={r'/*': {'origins': 'https://electricien-nimes.com'}})
 
 
 # Get blogs from Google Sheet
