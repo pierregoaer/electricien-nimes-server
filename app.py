@@ -70,7 +70,7 @@ def get_blogs():
 
 
 @app.route('/contact', methods=['POST'])
-@cross_origin(origins='https://electricien-nimes.com/contact/')
+@cross_origin(allow_headers=['Content-Type'], origins=['https://electricien-nimes.com/contact', 'https://electricien-nimes.com/contact/'])
 def contact():
     # get contact form data
     form_data = request.get_json()
