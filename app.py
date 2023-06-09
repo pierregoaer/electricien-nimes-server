@@ -88,11 +88,11 @@ def contact():
         today = datetime.today().strftime("%d/%m/%Y %H:%M:%S")
 
         # update google sheet
-        contacts_worksheet = gsheet_file.worksheet("contacts")
-        worksheet_rows = len(contacts_worksheet.get_all_values())
-        new_data = [today, name, email, phone, service, timeframe, budget, message]
-        for col in range(1, len(new_data) + 1):
-            contacts_worksheet.update_cell(worksheet_rows + 1, col, str(new_data[col - 1]))
+        # contacts_worksheet = gsheet_file.worksheet("contacts")
+        # worksheet_rows = len(contacts_worksheet.get_all_values())
+        # new_data = [today, name, email, phone, service, timeframe, budget, message]
+        # for col in range(1, len(new_data) + 1):
+        #     contacts_worksheet.update_cell(worksheet_rows + 1, col, str(new_data[col - 1]))
 
         # send email notification
         html = f"Electricien Nîmes - Nouveau message!<br>" \
@@ -113,7 +113,8 @@ def contact():
             recipients=[os.environ["EMAIL_RECIPIENT_1"], os.environ["EMAIL_RECIPIENT_2"]]
         )
         mail.send(msg)
-        return "success", 200
+        response = jsonify(message="Message sent successfully")
+        return response
 
 
 if __name__ == "__main__":
