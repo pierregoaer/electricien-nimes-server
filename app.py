@@ -24,7 +24,7 @@ mail = Mail(app)
 # DEV CORS
 # cors = CORS(app, resources={r'/*': {'origins': '*'}})
 # PROD CORS
-cors = CORS(app, resources={r'/*': {'origins': 'https://electricien-nimes.com'}})
+CORS(app, origins="https://electricien-nimes.com")
 
 
 # Get blogs from Google Sheet
@@ -62,52 +62,58 @@ blogs = cursor.fetchall()
 
 
 @app.route('/get-blogs')
-# @cross_origin(origins='https://electricien-nimes.com')
 def get_blogs():
     return jsonify(blogs), 200
 
 
-@app.route('/contact', methods=['POST'])
-# @cross_origin(origins='https://electricien-nimes.com')
+@app.route('/contact', methods=['POST', 'OPTIONS'])
 def contact():
-    # get contact form data
-    form_data = request.get_json()
-    name = form_data["name"]
-    email = form_data["email"]
-    phone = form_data["phone"]
-    service = form_data["service"]
-    timeframe = form_data["timeframe"]
-    budget = form_data["budget"]
-    message = form_data["message"]
-    today = datetime.today().strftime("%d/%m/%Y %H:%M:%S")
+    if request.method == "OPTIONS":
+        # Handle CORS preflight request
+        response = jsonify({"message": "CORS preflight request successful"})
+        response.headers.add("Access-Control-Allow-Origin", "https://electricien-nimes.com")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+        response.headers.add("Access-Control-Allow-Methods", "POST")
+        return response
+    if request.method == "POST":
+        # get contact form data
+        form_data = request.get_json()
+        name = form_data["name"]
+        email = form_data["email"]
+        phone = form_data["phone"]
+        service = form_data["service"]
+        timeframe = form_data["timeframe"]
+        budget = form_data["budget"]
+        message = form_data["message"]
+        today = datetime.today().strftime("%d/%m/%Y %H:%M:%S")
 
-    # update google sheet
-    contacts_worksheet = gsheet_file.worksheet("contacts")
-    worksheet_rows = len(contacts_worksheet.get_all_values())
-    new_data = [today, name, email, phone, service, timeframe, budget, message]
-    for col in range(1, len(new_data) + 1):
-        contacts_worksheet.update_cell(worksheet_rows + 1, col, str(new_data[col - 1]))
+        # update google sheet
+        contacts_worksheet = gsheet_file.worksheet("contacts")
+        worksheet_rows = len(contacts_worksheet.get_all_values())
+        new_data = [today, name, email, phone, service, timeframe, budget, message]
+        for col in range(1, len(new_data) + 1):
+            contacts_worksheet.update_cell(worksheet_rows + 1, col, str(new_data[col - 1]))
 
-    # send email notification
-    html = f"Electricien Nîmes - Nouveau message!<br>" \
-           f"<br>" \
-           f"Date : {today}<br>" \
-           f"Nom : {name}<br>" \
-           f"Email : {email}<br>" \
-           f"Téléphone : {phone}<br>" \
-           f"Service : {service}<br>" \
-           f"Délais : {timeframe}<br>" \
-           f"Budget : {budget}<br>" \
-           f"Message : {message}<br><br>" \
-           f"Voir https://docs.google.com/spreadsheets/d/1PDZtqhsUVgdv83s_uAGr3Z_ElT4_dfMtBocGqSq9SxM/edit#gid=330549784"
-    msg = Message(
-        subject='Electricien Nîmes - Nouveau message!',
-        html=html,
-        sender=('Contact - Electricien Nîmes', app.config['MAIL_USERNAME']),
-        recipients=[os.environ["EMAIL_RECIPIENT_1"], os.environ["EMAIL_RECIPIENT_2"]]
-    )
-    mail.send(msg)
-    return "success", 200
+        # send email notification
+        html = f"Electricien Nîmes - Nouveau message!<br>" \
+               f"<br>" \
+               f"Date : {today}<br>" \
+               f"Nom : {name}<br>" \
+               f"Email : {email}<br>" \
+               f"Téléphone : {phone}<br>" \
+               f"Service : {service}<br>" \
+               f"Délais : {timeframe}<br>" \
+               f"Budget : {budget}<br>" \
+               f"Message : {message}<br><br>" \
+               f"Voir https://docs.google.com/spreadsheets/d/1PDZtqhsUVgdv83s_uAGr3Z_ElT4_dfMtBocGqSq9SxM/edit#gid=330549784"
+        msg = Message(
+            subject='Electricien Nîmes - Nouveau message!',
+            html=html,
+            sender=('Contact - Electricien Nîmes', app.config['MAIL_USERNAME']),
+            recipients=[os.environ["EMAIL_RECIPIENT_1"], os.environ["EMAIL_RECIPIENT_2"]]
+        )
+        mail.send(msg)
+        return "success", 200
 
 
 if __name__ == "__main__":
